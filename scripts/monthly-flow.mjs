@@ -67,7 +67,7 @@ export function reportRelPath(targetYm, mmDd) {
 function buildPrompt(targetYm, mmDd) {
   const report = reportRelPath(targetYm, mmDd);
   return [
-    `更新：${targetYm}。`,
+    `更新：${targetYm}`,
     '禁止追问。按项汇报状态（有区用 regions.json 的 label；无分区用中文省）：下载失败，原因：xxx / 解析失败，原因：xxx / 更新成功 / 上传失败，原因：xxx。不要贴电价 JSON。',
     '末尾空一行后再写汇总：汇总：成功更新 N 项，分别为 …；未更新 M 项：…。（范围=本次目标展开后的全部应报项；M=0 写未更新 0 项。）',
     `把对用户的最终按项汇报全文（含汇总）写入 ${report}（已有则覆盖）。`,
