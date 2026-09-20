@@ -1,0 +1,20 @@
+{
+  "name": "elec-policy-opencode",
+  "version": "1.0.0",
+  "description": "按省、按月从网上国网取电价文件，解析 JSON 并上传。落盘 data/file 供人核对。",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "fetch": "node .opencode/skills/fetch-download/scripts/run.mjs",
+    "monthly-flow": "node scripts/monthly-flow.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "playwright": "^1.55.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

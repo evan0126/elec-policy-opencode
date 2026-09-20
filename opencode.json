@@ -1,0 +1,58 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "zhipuai-coding-plan/glm-5.3",
+  "small_model": "zhipuai-coding-plan/glm-5.3-flash",
+  "default_agent": "build",
+  "permission": {
+    "read": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "edit": "allow",
+    "bash": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "todowrite": "allow",
+    "doom_loop": "allow",
+    "external_directory": "allow",
+    "skill": {
+      "*": "deny",
+      "flow": "allow",
+      "fetch-download": "allow",
+      "parse": "allow",
+      "upload": "allow"
+    }
+  },
+  "agent": {
+    "general": {
+      "model": "zhipuai-coding-plan/glm-4.6v"
+    },
+    "build": {
+      "model": "zhipuai-coding-plan/glm-5.3",
+      "permission": {
+        "question": "deny",
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "edit": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "websearch": "allow",
+        "todowrite": "allow",
+        "doom_loop": "allow",
+        "external_directory": "allow",
+        "task": {
+          "*": "deny",
+          "general": "allow"
+        }
+      }
+    },
+    "plan": {
+      "permission": {
+        "skill": "deny",
+        "task": "deny"
+      }
+    }
+  }
+}

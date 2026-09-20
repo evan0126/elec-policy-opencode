@@ -1,0 +1,293 @@
+{
+  "entry": "https://www.95598.cn/osgweb/index",
+  "excludeTitle": ["1.5倍", "输配电价", "销售电价", "农田灌溉", "新能源电价信息表", "1-12月"],
+  "unsupported": ["jibei", "taiwan", "hongkong", "macao"],
+  "aliases": {
+    "北京": "beijing",
+    "京": "beijing",
+    "天津": "tianjin",
+    "河北": "hebei",
+    "河北南网": "hebei",
+    "冀北": "jibei",
+    "山西": "shanxi",
+    "内蒙古": "neimeng",
+    "内蒙": "neimeng",
+    "蒙东": "neimeng",
+    "辽宁": "liaoning",
+    "吉林": "jilin",
+    "黑龙江": "heilongjiang",
+    "上海": "shanghai",
+    "沪": "shanghai",
+    "江苏": "jiangsu",
+    "浙江": "zhejiang",
+    "安徽": "anhui",
+    "福建": "fujian",
+    "江西": "jiangxi",
+    "山东": "shandong",
+    "河南": "henan",
+    "湖北": "hubei",
+    "湖南": "hunan",
+    "重庆": "chongqing",
+    "四川": "sichuan",
+    "西藏": "xizang",
+    "陕西": "shaanxi",
+    "甘肃": "gansu",
+    "青海": "qinghai",
+    "宁夏": "ningxia",
+    "新疆": "xinjiang",
+    "广东": "guangdong",
+    "广西": "guangxi",
+    "海南": "hainan",
+    "贵州": "guizhou",
+    "云南": "yunnan",
+    "台湾": "taiwan",
+    "香港": "hongkong",
+    "澳门": "macao"
+  },
+  "provinces": {
+    "beijing": {
+      "name": "北京",
+      "portalCity": "北京",
+      "columnPath": ["信息公开", "电价标准", "工商业用户代理购电"],
+      "finder": "sgTable",
+      "titlePattern": "YYYY年M月国网北京市电力公司代理购电价格公示表"
+    },
+    "tianjin": {
+      "name": "天津",
+      "portalCity": "天津",
+      "columnPath": ["信息公开", "电价标准", "代理购电"],
+      "finder": "sgImage",
+      "titlePattern": "国网天津市电力公司关于YYYY年M月代理购电价格的公告"
+    },
+    "hebei": {
+      "name": "河北",
+      "portalCity": "河北",
+      "columnPath": ["信息公开", "执行的电价和收费标准"],
+      "finder": "sgNotice",
+      "titlePattern": "国网河北省电力有限公司YYYY年M月代理购电价格公告"
+    },
+    "shanxi": {
+      "name": "山西",
+      "portalCity": "山西",
+      "columnPath": ["信息公开", "电价标准", "代理购电"],
+      "finder": "sgImage",
+      "titlePattern": "国网山西省电力有限公司关于YYYY年M月代理购电价格公告"
+    },
+    "neimeng": {
+      "name": "内蒙古",
+      "portalCity": "内蒙",
+      "columnPath": ["信息公开", "电价标准", "代理购电"],
+      "finder": "sgTable",
+      "titlePattern": "YYYY年M月代理购电工商业用户电价"
+    },
+    "liaoning": {
+      "name": "辽宁",
+      "portalCity": "辽宁",
+      "columnPath": ["信息公开", "电价标准", "代理购电价格表"],
+      "finder": "sgTable",
+      "titlePattern": "YYYY年M月国网辽宁省电力有限公司代理购电工商业用户电价表"
+    },
+    "jilin": {
+      "name": "吉林",
+      "portalCity": "吉林",
+      "columnPath": ["信息公开", "执行的电价和收费标准"],
+      "finder": "sgNotice",
+      "titlePattern": "国网吉林省电力有限公司YYYY年M月代理购电工商业用户电价"
+    },
+    "heilongjiang": {
+      "name": "黑龙江",
+      "portalCity": "黑龙江",
+      "columnPath": ["信息公开", "电价标准", "代理购电价格"],
+      "finder": "sgTable",
+      "titlePattern": "国网黑龙江省电力有限公司YYYY年M月工商业代理购电电价表"
+    },
+    "shanghai": {
+      "name": "上海",
+      "portalCity": "上海",
+      "columnPath": ["信息公开", "电价标准", "代理购电"],
+      "finder": "sgTable",
+      "titlePattern": "上海市YYYY年M月代理购电价格表"
+    },
+    "jiangsu": {
+      "name": "江苏",
+      "portalCity": "江苏",
+      "columnPath": ["信息公开", "电价标准", "代理购电"],
+      "finder": "sgTable",
+      "titlePattern": "国网江苏省电力有限公司关于YYYY年M月代理购电工商业用户电价的公告"
+    },
+    "zhejiang": {
+      "name": "浙江",
+      "portalCity": "浙江",
+      "columnPath": ["信息公开", "执行的电价和收费标准"],
+      "finder": "sgNotice",
+      "titlePattern": "国网浙江省电力有限公司关于YYYY年M月代理工商业用户购电价格的公告"
+    },
+    "anhui": {
+      "name": "安徽",
+      "portalCity": "安徽",
+      "columnPath": ["信息公开", "电价标准", "代理购电价格表"],
+      "finder": "sgTable",
+      "titlePattern": "国网安徽省电力有限公司YYYY年M月代理购电价格公告",
+      "excludeTitle": ["周报", "实际结算", "周修正"]
+    },
+    "fujian": {
+      "name": "福建",
+      "portalCity": "福建",
+      "columnPath": ["信息公开", "执行的电价和收费标准"],
+      "finder": "sgNotice",
+      "titlePattern": "福建工商业代理购电价格（YYYY年M月）"
+    },
+    "jiangxi": {
+      "name": "江西",
+      "portalCity": "江西",
+      "columnPath": ["信息公开", "电价标准", "代理购电"],
+      "finder": "sgTable",
+      "titlePattern": "国网江西省电力有限公司YYYY年M月代理购电价格公告"
+    },
+    "shandong": {
+      "name": "山东",
+      "portalCity": "山东",
+      "columnPath": ["信息公开", "电价标准", "代理购电价格表"],
+      "finder": "sgImage",
+      "titlePattern": "国网山东省电力公司YYYY年M月代理购电价格"
+    },
+    "henan": {
+      "name": "河南",
+      "portalCity": "河南",
+      "columnPath": ["信息公开", "电价标准", "代理购电"],
+      "finder": "sgTable",
+      "titlePattern": "国网河南省电力公司YYYY年M月代理购电价格公告"
+    },
+    "hubei": {
+      "name": "湖北",
+      "portalCity": "湖北",
+      "columnPath": ["信息公开", "电价标准", "代理购电"],
+      "finder": "sgImage",
+      "titlePattern": "YYYY年M月代理购电电价"
+    },
+    "hunan": {
+      "name": "湖南",
+      "portalCity": "湖南",
+      "columnPath": ["信息公开", "执行的电价和收费标准"],
+      "finder": "sgNotice",
+      "titlePattern": "YYYY年M月代理购电电价"
+    },
+    "chongqing": {
+      "name": "重庆",
+      "portalCity": "重庆",
+      "columnPath": ["信息公开", "电价标准", "代理购电"],
+      "finder": "sgTable",
+      "titlePattern": "YYYY年M月国网重庆市电力公司代理购电工商业用户电价表"
+    },
+    "sichuan": {
+      "name": "四川",
+      "portalCity": "四川",
+      "columnPath": ["信息公开", "电价标准", "代理购电"],
+      "finder": "sgTable",
+      "titlePattern": "四川省YYYY年M月代理购电工商业电价表"
+    },
+    "xizang": {
+      "name": "西藏",
+      "portalCity": "西藏",
+      "columnPath": ["信息公开", "电价标准"],
+      "finder": "sgTable",
+      "titlePattern": "大工业用电峰谷分时和一般工商业用电价格表",
+      "matchYearMonth": false,
+      "excludeTitle": ["农业生产", "居民"],
+      "note": "无按月代理购电，已取峰谷表"
+    },
+    "shaanxi": {
+      "name": "陕西",
+      "portalCity": "陕西",
+      "columnPath": ["信息公开", "电价标准", "代理购电"],
+      "finder": "sgTable",
+      "titlePattern": "YYYY年M月份代理购电电价"
+    },
+    "gansu": {
+      "name": "甘肃",
+      "portalCity": "甘肃",
+      "columnPath": ["信息公开", "电价标准", "代理购电价格"],
+      "finder": "sgImage",
+      "titlePattern": "甘肃YYYY年M月份代理购电价格"
+    },
+    "qinghai": {
+      "name": "青海",
+      "portalCity": "青海",
+      "columnPath": ["信息公开", "电价标准", "代理购电"],
+      "finder": "sgTable",
+      "titlePattern": "国网青海省电力公司关于YYYY年M月代理购电价格的公告"
+    },
+    "ningxia": {
+      "name": "宁夏",
+      "portalCity": "宁夏",
+      "columnPath": ["信息公开", "电价标准", "代理购电电价"],
+      "finder": "sgTable",
+      "titlePattern": "代理购电电价表（YYYY年M月）"
+    },
+    "xinjiang": {
+      "name": "新疆",
+      "portalCity": "新疆",
+      "columnPath": ["信息公开", "执行的电价和收费标准"],
+      "finder": "sgNotice",
+      "titlePattern": "YYYY年M月国网新疆电力有限公司代理购电工商业用户电价表"
+    },
+    "guangdong": {
+      "name": "广东",
+      "portal": "csg",
+      "entry": "https://95598.csg.cn/#/gd/hall",
+      "portalCity": "广州市",
+      "columnPath": ["营商环境", "信息公开", "电价及收费标准"],
+      "finder": "csgListImage",
+      "titlePattern": "广东电网有限责任公司关于YYYY年M月代理购电工商业用户价格的公告",
+      "titleExclude": [],
+      "extraSources": [
+        {
+          "id": "shenzhen",
+          "saveName": "广东深圳",
+          "portalCity": "深圳市",
+          "titlePattern": "YYYY年M月代理购电",
+          "titleInclude": ["深圳"]
+        }
+      ]
+    },
+    "guangxi": {
+      "name": "广西",
+      "portal": "csg",
+      "entry": "https://95598.csg.cn/#/gx/hall",
+      "portalCity": "南宁市",
+      "columnPath": ["营商环境", "信息公开", "电价及收费标准"],
+      "finder": "csgListImage",
+      "titlePattern": "YYYY年M月代理购电相关价格表",
+      "excludeTitle": ["目录销售", "输配电价"]
+    },
+    "hainan": {
+      "name": "海南",
+      "portal": "csg",
+      "entry": "https://95598.csg.cn/#/hn/hall",
+      "portalCity": "海口市",
+      "columnPath": ["营商环境", "信息公开", "电价及收费标准"],
+      "finder": "csgListImage",
+      "titlePattern": "海南电网有限责任公司代理购电工商业用户电价表（YYYY年M月）",
+      "excludeTitle": ["销售电价表"]
+    },
+    "guizhou": {
+      "name": "贵州",
+      "portal": "csg",
+      "entry": "https://95598.csg.cn/#/gz/hall",
+      "portalCity": "贵阳市",
+      "columnPath": ["营商环境", "信息公开", "电价及收费标准"],
+      "finder": "csgListImage",
+      "titlePattern": "贵州电网有限责任公司YYYY年M月代理购电用户电价公告"
+    },
+    "yunnan": {
+      "name": "云南",
+      "portal": "csg",
+      "entry": "https://95598.csg.cn/#/yn/hall",
+      "portalCity": "昆明市",
+      "columnPath": ["营商环境", "信息公开", "电价及收费标准"],
+      "finder": "csgListImage",
+      "titlePattern": "云南电网有限责任公司YYYY年M月代理购电工商业用户电价表",
+      "excludeTitle": ["销售电价表"]
+    }
+  }
+}

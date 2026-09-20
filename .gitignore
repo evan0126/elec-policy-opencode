@@ -1,0 +1,34 @@
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 本地个人配置（.opencode/ 是本仓库 skill 源码，不要忽略）
+.vscode/
+.idea/
+.cursor/
+.cursorrules
+*.swp
+*.swo
+*~
+
+# Secrets
+.env
+.env.*
+
+# Node
+node_modules/
+
+# Logs / temp
+*.log
+*.tmp
+*.temp
+tmp/
+*.traineddata
+
+# 当次下载 / 解析 / 定时汇报产出
+data/out/
+data/file/
+data/json/
+data/report/
