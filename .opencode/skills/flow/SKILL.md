@@ -18,7 +18,7 @@ description: >-
 | 更新：江苏、浙江 9 月（对话年份是 2026） | 月份 `2026-09`，省 `jiangsu`、`zhejiang` |
 | 更新：2026-10 | 月份 `2026-10`，省 = `sources.json` 已覆盖全省 |
 
-本会话维护 `pathMap`、`jsonMap`（失败项不放进去；value 都是本地路径）。
+本会话维护 `pathMap`、`jsonMap`（失败项和本轮开始前已有终稿的项不放进去；value 都是本轮新生成终稿的本地路径）。
 
 - `pathMap` key：标记电价来自哪份原文。省主原文用省 id；另一份原文用 `extraSources[].id`（如 `shenzhen`）。`id` 自定，且**不得**与 `sources.json` 的省 key / 别名撞名
 - `jsonMap` key：无 `regions.json` 配置用省 id；有配置用 `{provinceId}:{region}`（按实际写出的区；这里的 `:` 是分区，与 pathMap 无关）
@@ -47,21 +47,22 @@ description: >-
 
 **无** `regions.json` 配置：
 
-- 已有 `data/json/{YYYY-MM}/{中文省}.json` → `jsonMap[省id] =` 该路径（跳过解析）
-- 否则：该省相关 pathMap 项交给 `parse`
+- 本轮开始前已有 `data/json/{YYYY-MM}/{中文省}.json` → 该项记为「更新成功」，跳过解析且不进 `jsonMap`
+- 否则：该省相关 pathMap 项交给 `parse`，仅将本轮成功写出的终稿加入 `jsonMap`
 
 **有** `regions.json` 配置：
 
-- 对每个 `{ region, label }`：已有 `data/json/{YYYY-MM}/{label}.json` → `jsonMap["{省id}:{region}"] =` 该路径
+- 对每个 `{ region, label }`：本轮开始前已有 `data/json/{YYYY-MM}/{label}.json` → 该项记为「更新成功」，跳过解析且不进 `jsonMap`
 - 若仍有缺失的 label，且该省相关 pathMap 非空 → 把这些 pathMap 项交给 `parse`（`parse` 按认出的分区分别落盘，不合并；子会话的 `provinceId` 仍用父省 id）
 - 全部 label 都已有 → 不调 `parse`
 - pathMap 空且没有任何既有分区 JSON → 不进 jsonMap（下载失败）
+- 仅将本轮成功写出的缺失分区终稿按 `"{省id}:{region}"` 加入 `jsonMap`
 
 需要解析的 pathMap 子集为空 → 可不加载 `parse`。本会话不在 flow 里起 `@general`。
 
 ## 3. 上传
 
-`jsonMap` 空则不上报。否则加载 `upload`（月份 + jsonMap）。
+`jsonMap` 空则不上报。否则加载 `upload`（月份 + jsonMap）。`jsonMap` 只含本轮新解析的终稿，运行前已有的 JSON 不得上传。
 `upload` 回复 `{ status, error?, submitted }`（`submitted` = **jsonMap 的 key 列表**，有区就按区；一次整表 POST）。
 对人：`submitted` 各项一律跟整次 `status`（失败带 `error`）。
 
@@ -73,7 +74,7 @@ description: >-
 - 状态：下载失败，原因：xxx / 解析失败，原因：xxx / 更新成功 / 上传失败，原因：xxx
 - 不贴电价 JSON
 
-「本地已有原文 / 已有 JSON」只决定是否跳过下载或解析，不是对人终态。
+「本地已有原文」只决定是否跳过下载，不是对人终态；「本轮开始前已有 JSON」直接记为「更新成功」，但不进入 `jsonMap`、不上传。
 
 **末尾空一行后再写汇总**（显示名同上；范围 = 本次目标展开后的全部应报项：无分区一省一项，有 `regions.json` 则每个 label 一项）：
 
@@ -98,4 +99,4 @@ description: >-
 
 同时把**含汇总在内的**最终汇报全文写入 `data/report/{目标月}/{MM-DD}.txt`（已有则覆盖）。
 
-强制重解析：无分区删 `{中文省}.json`；有分区删对应 `{label}.json`（或该月该省全部 label 文件）。
+强制重解析并重新上传：无分区删 `{中文省}.json`；有分区删对应 `{label}.json`（或该月该省全部 label 文件）。

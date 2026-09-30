@@ -18,7 +18,7 @@
 ```
 人说「更新」→ flow
       ├─ 串行 fetch-download（有 extraSources → N+1 任务）→ pathMap
-      ├─ 按需 parse(pathMap) → 每 key @general（有分区按 label 分文件，不合并）→ jsonMap
+      ├─ 按需 parse(pathMap) → 每 key @general（有分区按 label 分文件，不合并）→ 本轮新终稿进入 jsonMap
       └─ 一次 upload(jsonMap) → { status, submitted } → flow 按项投影（有区按区）
 ```
 
@@ -30,6 +30,8 @@
 | `upload` | 按 jsonMap 路径读盘 → 接口一次提交 | `{ status, error?, submitted }`（submitted = jsonMap key） |
 
 人说示例：`更新：浙江、江苏 9 月` 或 `更新：2026-10`（不写省 = `sources.json` 已覆盖全省）。
+
+本轮开始前已有对应终稿 JSON 时，该项视为已完成：跳过解析，不进入 `jsonMap`，也不重复上传。删除终稿后再次更新，才会重新解析并上传。
 
 月末自动跑：系统定时器每天 `npm run monthly-flow`；仅在每月最后 3 天调用 `opencode run`（目标月为下月）。`flow` 把最终汇报写入 `data/report/{目标月}/{MM-DD}.txt`，脚本读该文件后发 1 条短信。
 

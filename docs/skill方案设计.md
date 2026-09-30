@@ -8,7 +8,7 @@ name 与 skill 目录名必须一致。已定：
 | `fetch-download` | `flow`            | 取直链并下载到本地，回复该省路径（每次一省）                                 |
 | `parse`          | `flow`            | 按 pathMap 解析并落盘 JSON；有 `regions.json` 则按 label 分文件，不合并 |
 | `upload`         | `flow`            | 按 jsonMap 路径读 JSON，提交到自有系统                             |
-| `flow`           | 人说「更新」（省可省略）或每月调度 | 串行下载 → 按项补 jsonMap（已有终稿则跳过解析）→ 一次上传；允许半份               |
+| `flow`           | 人说「更新」（省可省略）或每月调度 | 串行下载 → 仅将本轮新终稿补进 jsonMap（已有终稿直接跳过）→ 一次上传；允许半份     |
 
 
 `flow` 按顺序加载它们；上一 skill 的**回复**由 `flow` 在会话里收齐，再写进下一 skill 的**入参**。
@@ -249,7 +249,7 @@ function fail(msg) {}                  // 回复失败原因（flow 不把该省
 
 ### 入出参怎么经 `flow` 传
 
-1. `fetch-download` 成功路径由 `flow` 收进完整 `pathMap`。传给本 skill 时，`flow` **只放还缺 JSON 的那些 key**（已有 JSON 的由 `flow` 自己写入 `jsonMap`）。
+1. `fetch-download` 成功路径由 `flow` 收进完整 `pathMap`。传给本 skill 时，`flow` **只放还缺 JSON 的那些 key**（已有 JSON 的项视为已完成，不进入 `jsonMap`）。
 2. **本 skill**：父会话按 key 检查读表规则是否存在（§2.1），再起 `@general`（不打开电价 / 覆盖 md 正文）。每个 `@general` 只打开对应那一份原文；解析成功后**由该子会话直接写出** `data/json/...`（无分区 → `{中文省}.json`，有分区 → 各 `{label}.json`），不要把 JSON 交回父会话再写盘。
 3. 父会话根据回复收齐 `jsonMap`（无合并、无 `_part`）。不要在会话里贴整份 JSON 正文。
 
@@ -365,7 +365,7 @@ pathMap: { "zhejiang": "data/file/2026-09/浙江_电价表.pdf" }
 
 ### 入出参怎么经 `flow` 传
 
-1. 上一环 `parse`（及 flow 跳过解析直接收入的路径）汇总的 `jsonMap` 由 `flow` **原样**写入本 skill 入参（再加月份）。
+1. 上一环 `parse` 本轮新生成路径汇总的 `jsonMap` 由 `flow` **原样**写入本 skill 入参（再加月份）；运行前已有终稿不进入本 skill。
 2. 按路径读出各 JSON 数组，摊平为接口数组，登录后一次 POST。
 3. 按整次结果回复。`submitted` 与 **jsonMap key 一致**（有区就按区，不按省去重）。`flow` 投影给人时：无分区显示中文省，有分区显示 `label`。
 
@@ -484,7 +484,7 @@ Content-Type: application/json
 对人按项回复（有区就按区，显示 `label`；无分区用中文省）：下载失败，原因：xxx / 解析失败，原因：xxx / 更新成功 / 上传失败，原因：xxx。不贴电价 JSON。  
 末尾空一行后再写汇总：`汇总：成功更新 N 项，分别为 …；未更新 M 项：…。`（范围 = 本次目标展开后的全部应报项）。  
 
-（「本地已有原文 / 已有 JSON」只影响是否跳过下载或解析，**不是**对人终态。）
+（「本地已有原文」只影响是否跳过下载；本轮开始前「已有 JSON」的项直接视为更新成功，但不进入 `jsonMap`、不上传。）
 
 ### 人调用示例
 
@@ -516,8 +516,8 @@ Content-Type: application/json
 
 ## 2. 解析 → jsonMap
 
-- 无 `regions.json`：已有 `{中文省}.json` → 直接进 jsonMap；否则 parse
-- 有配置：已有的 `{label}.json` 按 `{省id}:{region}` 进 jsonMap；仍缺 label 且 pathMap 非空 → parse（按分区分文件落盘，**不合并**）
+- 无 `regions.json`：已有 `{中文省}.json` → 视为已完成且不进 jsonMap；否则 parse，本轮新终稿进 jsonMap
+- 有配置：已有的 `{label}.json` 视为已完成且不进 jsonMap；仍缺 label 且 pathMap 非空 → parse（按分区分文件落盘，**不合并**），本轮新终稿按 `{省id}:{region}` 进 jsonMap
 - 全部 label 已有 → 不调 parse
 
 ## 3. 上传
@@ -539,7 +539,7 @@ jsonMap 非空则一次 `upload`。`submitted` = jsonMap key（有区就按区�
 - 每月**最后 3 个自然日**各跑 **1 次**（例如 9 月 → 28、29、30；2 月非闰年 → 26、27、28）。
 - 目标月份固定为**下月** `YYYY-MM`。例：2026-09-28～30，目标月都是 `2026-10`。
 - 省列表：不写省时 = `sources.json` 已覆盖全省。
-- 连跑 3 天补晚发：已有原文跳过下载；已有终稿 JSON（无分区 `{中文省}.json` / 有分区各 `{label}.json`）跳过解析、直接进 jsonMap 仍上传；仍缺的继续。允许半份入库。
+- 连跑 3 天补晚发：已有原文跳过下载；已有终稿 JSON（无分区 `{中文省}.json` / 有分区各 `{label}.json`）视为已完成，跳过解析且不重复上传；仍缺的继续，本轮新生成终稿才进 jsonMap。允许半份入库。
 
 非最后 3 天不调 `opencode run`，脚本直接退出 0。
 
@@ -548,7 +548,7 @@ jsonMap 非空则一次 `upload`。`submitted` = jsonMap key（有区就按区�
 1. 落盘 `scripts/monthly-flow.mjs`。
 2. 系统定时器每天跑一次（工作目录 = 仓库根）。
 3. 最后 3 天：`opencode run` 更新 `{目标月}`；读 `data/report/{目标月}/{MM-DD}.txt` 发短信。
-4. 强制重解析：无分区删 `{中文省}.json`；有分区删对应 `{label}.json`。
+4. 强制重解析并重新上传：无分区删 `{中文省}.json`；有分区删对应 `{label}.json`。
 
 ---
 
@@ -627,7 +627,7 @@ jsonMap 非空则一次 `upload`。`submitted` = jsonMap key（有区就按区�
 //   guangdong → provinces/guangdong.md → 各区 {label}.json（含江门）
 //   shenzhen → provinces/shenzhen.md → 广东深圳.json
 
-// jsonMap（有区按区；半份：只含已成功项）
+// jsonMap（有区按区；半份：只含本轮新生成的成功项）
 {
   "guangdong:GD_PEARL_RIVER_DELTA_FIVE_CITIES": "data/json/2026-09/广东珠三角五市.json",
   "guangdong:GD_HUIZHOU": "data/json/2026-09/广东惠州市.json",
@@ -638,5 +638,4 @@ jsonMap 非空则一次 `upload`。`submitted` = jsonMap key（有区就按区�
 }
 ```
 
-对人汇报按 `label` 逐项；空一行后再写汇总。已有 `{label}.json` 时 flow 可跳过对应解析。
-
+对人汇报按 `label` 逐项；空一行后再写汇总。运行前已有 `{label}.json` 时，flow 跳过对应解析且不将该项加入 `jsonMap`，因此不会重复上传。

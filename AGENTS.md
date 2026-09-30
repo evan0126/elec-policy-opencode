@@ -5,9 +5,9 @@
 ## 运行时
 
 - 用 **OpenCode** 打开本仓库根目录。技能只从 `.opencode/` 发现。
-- 主会话用 **Build**。人说「更新」加月份（省可省略，省略则跑 `sources.json` 已覆盖全省）加载 `flow`：**串行 `fetch-download`（有 `extraSources` 则 N+1 任务）→ 按项补 `jsonMap`（已有终稿则跳过 `parse`）→ 一次 `upload`**。允许半份入库。
+- 主会话用 **Build**。人说「更新」加月份（省可省略，省略则跑 `sources.json` 已覆盖全省）加载 `flow`：**串行 `fetch-download`（有 `extraSources` 则 N+1 任务）→ 只把本轮新解析的终稿补进 `jsonMap`（已有终稿直接跳过）→ 一次 `upload`**。允许半份入库。
 - 月末调度：`npm run monthly-flow`（最后 3 天跑下月 `{目标月}`；汇报落 `data/report/{目标月}/{MM-DD}.txt`；非窗口退出 0）。
-- 落盘：原文 `data/file/{YYYY-MM}/{中文名}_电价表.{后缀}`；解析 JSON——无 `regions.json` 配置为 `data/json/{YYYY-MM}/{中文省}.json`，有配置为各 `data/json/{YYYY-MM}/{label}.json`（**不**汇成一省一份）；定时汇报 `data/report/{目标月}/{MM-DD}.txt`。本地已有原文则跳过下载；本地已有对应终稿 JSON 则跳过解析、直接进 `jsonMap` 仍上传。
+- 落盘：原文 `data/file/{YYYY-MM}/{中文名}_电价表.{后缀}`；解析 JSON——无 `regions.json` 配置为 `data/json/{YYYY-MM}/{中文省}.json`，有配置为各 `data/json/{YYYY-MM}/{label}.json`（**不**汇成一省一份）；定时汇报 `data/report/{目标月}/{MM-DD}.txt`。本地已有原文则跳过下载；本轮开始前已有的对应终稿 JSON 视为已完成，跳过解析且不进 `jsonMap`，不再上传。
 - `pathMap` key：标记电价来自哪份原文。省主原文用省 id；另一份原文用 `extraSources[].id`（如 `shenzhen`）。`jsonMap` key：无分区用省 id；有 `regions.json` 用 `{provinceId}:{region}`（按实际写出的区）。不要在会话里贴整份 JSON。解析读 `pathMap` 路径，不要扫目录猜文件。
 - 取链下载脚本：`npm run fetch -- {id|sourceId} {YYYY-MM}`（Playwright）。不要用 Plan。
 - 密钥用本机 `auth.json` 或环境变量（上传用 `ELEC_POLICY_API_*`），不要写入仓库。模型以 `opencode.json` 为准。
