@@ -32,3 +32,5 @@ data/out/
 data/file/
 data/json/
 data/report/
+
+upload.config.json

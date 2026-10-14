@@ -43,7 +43,7 @@ echo '<jsonMap>' | node .opencode/skills/upload/scripts/post.mjs YYYY-MM
 | 登录 | `POST {BASE}/login`，body `{ "name", "password" }`；token 从响应取出 |
 | 入库 | `POST {BASE}/electricity-policy/save`；带登录 token；body 为整表数组 |
 
-`BASE`、用户名、密码只读环境变量（`ELEC_POLICY_API_*`），不写进 skill 正文。登录失败不要调 save。
+接口地址、用户名、密码由脚本读取根目录 `upload.config.json` 的 `base`、`user`、`password`。不要读取或输出本地配置正文。参考 `upload.config.example.json`，`enabled: false`（缺省也是 false）时，在读电价 JSON、登录、POST 之前返回 `{ "status": "仅解析", "submitted": [] }`；`enabled: true` 才上传。登录失败不要调 save。
 
 字段映射与枚举约束见设计文档 §3.1：`customerCategory` 只准三项；`voltageLevel` 只准规定 LEVEL_*；不满 1 千伏跳过；`touPeriods` 跳过价为 null 的时段。有区时 `name` 前缀用 `regions.json` 的 `label`，不用省名。不要改枚举大小写，不要把 `region` 缺省成全省名。
 

@@ -361,7 +361,7 @@ pathMap: { "zhejiang": "data/file/2026-09/浙江_电价表.pdf" }
 
 ## 3. upload
 
-按 `flow` 传入的 `jsonMap`（省 id 或 `{provinceId}:{regionId}` → 本地 JSON 路径）读盘，转成接口数组，提交到自有系统。地址、用户名、密码只读环境变量。不下载、不解析电价原文。
+按 `flow` 传入的 `jsonMap`（省 id 或 `{provinceId}:{regionId}` → 本地 JSON 路径）读盘，转成接口数组，提交到自有系统。地址、用户名、密码只读根目录 `upload.config.json`。不下载、不解析电价原文。
 
 ### 入出参怎么经 `flow` 传
 
@@ -447,7 +447,7 @@ function postApi(body) {}            // 先 login 再 POST {BASE}/electricity-po
 
 ### 3.2 登录
 
-无数据则不登录、不提交。用户名、密码只读环境变量，不写进 skill 正文。
+无数据则不登录、不提交。用户名、密码只读根目录 `upload.config.json`，不写进 skill 正文。
 
 ```
 POST {BASE}/login
@@ -459,7 +459,7 @@ Content-Type: application/json
 响应里取出登录 token。失败则整次 `{ "status": "上传失败", "error": "..." }`（`submitted` 仍为拟提交的 jsonMap key），不要调 save。
 
 ```js
-function login() {}                  // POST {BASE}/login；body 为 { name, password }，都从环境变量读；返回 token
+function login() {}                  // POST {BASE}/login；body 为 { name, password }，都从根目录 upload.config.json 读；返回 token
 ```
 
 ### 3.3 提交
@@ -469,7 +469,7 @@ POST {BASE}/electricity-policy/save
 Content-Type: application/json
 ```
 
-带上 3.2 拿到的 token。`BASE`、用户名、密码只读环境变量，不写进 skill 正文。body 为 3.1 转出的数组，一次 POST 全部省。
+带上 3.2 拿到的 token。`BASE`、用户名、密码只读根目录 `upload.config.json`，不写进 skill 正文。body 为 3.1 转出的数组，一次 POST 全部省。
 
 ---
 

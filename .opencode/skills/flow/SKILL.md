@@ -62,6 +62,8 @@ description: >-
 
 ## 3. 上传
 
+必须通过 upload 脚本检查上传开关，不要读取本地账密配置正文。配置见根目录 `upload.config.example.json`；本地 `upload.config.json` 的 `enabled` 默认 false，仅使用该配置文件。脚本返回 `{ "status": "仅解析", "submitted": [] }` 时，按 jsonMap key 报告「解析成功（未上传）」，不要按空 submitted 丢失这些项。汇总另列「仅解析 N 项」，不计入上传成功或失败；定时报告同样使用该状态。已有终稿不会因开启上传自动补传。
+
 `jsonMap` 空则不上报。否则加载 `upload`（月份 + jsonMap）。`jsonMap` 只含本轮新解析的终稿，运行前已有的 JSON 不得上传。
 `upload` 回复 `{ status, error?, submitted }`（`submitted` = **jsonMap 的 key 列表**，有区就按区；一次整表 POST）。
 对人：`submitted` 各项一律跟整次 `status`（失败带 `error`）。

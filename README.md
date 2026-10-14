@@ -6,9 +6,15 @@
 
 ## 环境
 
+上传配置：复制根目录 `upload.config.example.json` 为 `upload.config.json`（已被 Git 忽略），填写 `base`（接口地址）、`user`（账号）、`password`（密码）。`enabled: false` 表示只下载、解析并保存 JSON，不登录、不上传；`enabled: true` 才允许上传。未创建配置文件时默认关闭上传，脚本不再内置默认账密。
+
+上传仅使用配置文件，固定从项目根目录读取 `upload.config.json`。
+
+已有终稿仍按原规则跳过；开启上传不会自动补传只解析生成的文件。补传需直接调用 upload 并传入已有文件的 jsonMap，或删除对应终稿后重新更新。
+
 1. 安装 [OpenCode](https://opencode.ai)。
 2. 在本仓库**根目录**打开，否则扫不到 `.opencode/skills`。
-3. 密钥不要写入仓库：`opencode auth login`，或环境变量；上传另需 `ELEC_POLICY_API_BASE` / `ELEC_POLICY_API_USER` / `ELEC_POLICY_API_PASSWORD`。
+3. 密钥不要写入仓库：`opencode auth login`，或环境变量；上传接口地址、账密及开关统一配置在根目录 `upload.config.json`。
 4. 模型以 `opencode.json` 为准。
 5. 取链下载：`npm run fetch -- {id|sourceId} {YYYY-MM}`（Playwright 无头；额外原文如 `shenzhen`）。
 6. 使用 **Build**。不要用 Plan 出数。

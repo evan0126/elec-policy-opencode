@@ -10,7 +10,7 @@
 - 落盘：原文 `data/file/{YYYY-MM}/{中文名}_电价表.{后缀}`；解析 JSON——无 `regions.json` 配置为 `data/json/{YYYY-MM}/{中文省}.json`，有配置为各 `data/json/{YYYY-MM}/{label}.json`（**不**汇成一省一份）；定时汇报 `data/report/{目标月}/{MM-DD}.txt`。本地已有原文则跳过下载；本轮开始前已有的对应终稿 JSON 视为已完成，跳过解析且不进 `jsonMap`，不再上传。
 - `pathMap` key：标记电价来自哪份原文。省主原文用省 id；另一份原文用 `extraSources[].id`（如 `shenzhen`）。`jsonMap` key：无分区用省 id；有 `regions.json` 用 `{provinceId}:{region}`（按实际写出的区）。不要在会话里贴整份 JSON。解析读 `pathMap` 路径，不要扫目录猜文件。
 - 取链下载脚本：`npm run fetch -- {id|sourceId} {YYYY-MM}`（Playwright）。不要用 Plan。
-- 密钥用本机 `auth.json` 或环境变量（上传用 `ELEC_POLICY_API_*`），不要写入仓库。模型以 `opencode.json` 为准。
+- 模型密钥用本机 `auth.json` 或环境变量；上传仅使用根目录 `upload.config.json`，不要将账密写入仓库。模型以 `opencode.json` 为准。
 
 ## 隔离
 

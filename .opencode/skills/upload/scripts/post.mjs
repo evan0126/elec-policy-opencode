@@ -1,23 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { toApi } from './to-api.mjs';
-
-/** 与 nevermore-web `.env.development` 的 VITE_APP_BASE_URL 一致；可用环境变量覆盖 */
-const DEFAULT_BASE = 'http://api-test.star-grid.com/Nevermore';
-const DEFAULT_NAME = 'admin';
-const DEFAULT_PASSWORD = 'stargrid';
-
-function envBase() {
-  return process.env.ELEC_POLICY_API_BASE || process.env.BASE || DEFAULT_BASE;
-}
-
-function envName() {
-  return process.env.ELEC_POLICY_API_USER || process.env.ELEC_POLICY_API_NAME || DEFAULT_NAME;
-}
-
-function envPassword() {
-  return process.env.ELEC_POLICY_API_PASSWORD || DEFAULT_PASSWORD;
-}
+import { loadUploadConfig } from '../../../../scripts/upload-config.mjs';
 
 /** nevermore-web：登录成功为 `{ status: 2000, data: "<token>" }`，token 直接存在 data 字符串里 */
 function extractToken(data) {
@@ -141,6 +125,8 @@ export async function savePolicies(base, token, body) {
  * }>}
  */
 export async function uploadJsonMap(yearMonth, jsonMap) {
+  const config = loadUploadConfig();
+  if (!config.enabled) return { status: '仅解析', submitted: [] };
   const ids = Object.keys(jsonMap ?? {});
   if (ids.length === 0) {
     return { status: '跳过', submitted: [] };
@@ -158,9 +144,7 @@ export async function uploadJsonMap(yearMonth, jsonMap) {
     };
   }
 
-  const base = envBase();
-  const name = envName();
-  const password = envPassword();
+  const { base, user: name, password } = config;
   if (!base || !name || !password) {
     return {
       status: '上传失败',
