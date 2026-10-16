@@ -1,6 +1,17 @@
 {
   "enabled": false,
-  "base": "http://api-test.star-grid.com/Nevermore",
-  "user": "",
-  "password": ""
+  "environments": {
+    "test": {
+      "enabled": true,
+      "base": "http://api-test.star-grid.com/Nevermore",
+      "user": "",
+      "password": ""
+    },
+    "production": {
+      "enabled": false,
+      "base": "",
+      "user": "",
+      "password": ""
+    }
+  }
 }

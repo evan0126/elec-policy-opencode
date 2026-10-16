@@ -115,18 +115,14 @@ export async function savePolicies(base, token, body) {
 }
 
 /**
- * 一次整表 POST。submitted 与 jsonMap key 一致（有区按区）。
+ * 每个启用环境各一次整表 POST。submitted 与 jsonMap key 一致（有区按区）。
  * @param {string} yearMonth
  * @param {Record<string, string|unknown[]>} jsonMap 省 id 或 provinceId:regionId → 落盘路径
- * @returns {Promise<{
- *   status: '更新成功'|'上传失败'|'跳过',
- *   error?: string,
- *   submitted: string[],
- * }>}
+ * @param {ReturnType<typeof loadUploadConfig>} [config]
  */
-export async function uploadJsonMap(yearMonth, jsonMap) {
-  const config = loadUploadConfig();
-  if (!config.enabled) return { status: '仅解析', submitted: [] };
+export async function uploadJsonMap(yearMonth, jsonMap, config = loadUploadConfig()) {
+  const targets = Object.entries(config.environments).filter(([, target]) => target.enabled);
+  if (!config.enabled || targets.length === 0) return { status: '仅解析', submitted: [] };
   const ids = Object.keys(jsonMap ?? {});
   if (ids.length === 0) {
     return { status: '跳过', submitted: [] };
@@ -144,36 +140,30 @@ export async function uploadJsonMap(yearMonth, jsonMap) {
     };
   }
 
-  const { base, user: name, password } = config;
-  if (!base || !name || !password) {
-    return {
-      status: '上传失败',
-      error: 'missing API base / user / password',
-      submitted,
-    };
+  const environments = {};
+  for (const [id, target] of targets) {
+    const { base, user: name, password } = target;
+    try {
+      if (!base || !name || !password) throw new Error('missing API base / user / password');
+      const token = await login(base, { name, password });
+      await savePolicies(base, token, body);
+      environments[id] = { status: '更新成功', submitted };
+    } catch (e) {
+      environments[id] = {
+        status: '上传失败',
+        error: e instanceof Error ? e.message : String(e),
+        submitted,
+      };
+    }
   }
 
-  let token;
-  try {
-    token = await login(base, { name, password });
-  } catch (e) {
-    return {
-      status: '上传失败',
-      error: e instanceof Error ? e.message : String(e),
-      submitted,
-    };
-  }
-
-  try {
-    await savePolicies(base, token, body);
-    return { status: '更新成功', submitted };
-  } catch (e) {
-    return {
-      status: '上传失败',
-      error: e instanceof Error ? e.message : String(e),
-      submitted,
-    };
-  }
+  const failures = Object.entries(environments).filter(([, result]) => result.status === '上传失败');
+  return {
+    status: failures.length ? '上传失败' : '更新成功',
+    ...(failures.length ? { error: failures.map(([id, result]) => `${id}: ${result.error}`).join('; ') } : {}),
+    submitted,
+    environments,
+  };
 }
 
 async function main() {

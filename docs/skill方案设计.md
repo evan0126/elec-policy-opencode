@@ -363,13 +363,17 @@ pathMap: { "zhejiang": "data/file/2026-09/浙江_电价表.pdf" }
 
 按 `flow` 传入的 `jsonMap`（省 id 或 `{provinceId}:{regionId}` → 本地 JSON 路径）读盘，转成接口数组，提交到自有系统。地址、用户名、密码只读根目录 `upload.config.json`。不下载、不解析电价原文。
 
+配置按环境组织：根级 `enabled` 为总开关，`environments.test` / `environments.production` 分别配置 `enabled`、`base`、`user`、`password`。未知字段报错。所有开关缺省 false；总开关关闭或没有启用环境时返回「仅解析」，不读电价 JSON、不登录、不提交。示例见根目录 `upload.config.example.json`，生产部署与三种上传模式见 `docs/部署文档.md` §6。
+
+每个启用环境使用自己的账号、token，各提交一次同一个转换数组；一个环境失败不阻断其它环境。返回 `environments.test` / `environments.production` 分别记录结果；全部成功才返回整体「更新成功」，任何一个失败则整体「上传失败」，`error` 带环境标识。报告列出各环境实际状态，省 / 分区汇总不按环境重复计数。已有终稿不会因增加环境自动补传，须显式调用上传脚本，并只开启待补传环境。
+
 ### 入出参怎么经 `flow` 传
 
 1. 上一环 `parse` 本轮新生成路径汇总的 `jsonMap` 由 `flow` **原样**写入本 skill 入参（再加月份）；运行前已有终稿不进入本 skill。
-2. 按路径读出各 JSON 数组，摊平为接口数组，登录后一次 POST。
+2. 按路径读出各 JSON 数组，摊平为接口数组，各启用环境独立登录后各一次 POST。
 3. 按整次结果回复。`submitted` 与 **jsonMap key 一致**（有区就按区，不按省去重）。`flow` 投影给人时：无分区显示中文省，有分区显示 `label`。
 
-解析一条档位对应接口一条；多文件拼成**一个数组一次提交**。`jsonMap` 为空 → 不上报、不登录。
+解析一条档位对应接口一条；多文件拼成**一个数组，各启用环境各提交一次**。`jsonMap` 为空 → 不上报、不登录。
 
 示例：
 
@@ -391,14 +395,22 @@ pathMap: { "zhejiang": "data/file/2026-09/浙江_电价表.pdf" }
 // 成功
 {
   "status": "更新成功",
-  "submitted": ["zhejiang", "guangdong:GD_SHENZHEN", "guangdong:GD_HUIZHOU"]
+  "submitted": ["zhejiang", "guangdong:GD_SHENZHEN", "guangdong:GD_HUIZHOU"],
+  "environments": {
+    "test": { "status": "更新成功", "submitted": ["zhejiang", "guangdong:GD_SHENZHEN", "guangdong:GD_HUIZHOU"] },
+    "production": { "status": "更新成功", "submitted": ["zhejiang", "guangdong:GD_SHENZHEN", "guangdong:GD_HUIZHOU"] }
+  }
 }
 
 // 失败
 {
   "status": "上传失败",
-  "error": "接口返回的具体错误信息",
-  "submitted": ["zhejiang", "guangdong:GD_SHENZHEN", "guangdong:GD_HUIZHOU"]
+  "error": "production: 接口返回的具体错误信息",
+  "submitted": ["zhejiang"],
+  "environments": {
+    "test": { "status": "更新成功", "submitted": ["zhejiang"] },
+    "production": { "status": "上传失败", "error": "接口返回的具体错误信息", "submitted": ["zhejiang"] }
+  }
 }
 ```
 
@@ -409,7 +421,7 @@ pathMap: { "zhejiang": "data/file/2026-09/浙江_电价表.pdf" }
   SKILL.md
   scripts/
     to-api.mjs    # 读 jsonMap 路径 → 接口数组
-    post.mjs      # 先登录拿 token，再一次 POST
+    post.mjs      # 各启用环境独立登录，各一次 POST
 ```
 
 ### 3.1 转接口格式
@@ -456,7 +468,7 @@ Content-Type: application/json
 { "name": ..., "password": ... }
 ```
 
-响应里取出登录 token。失败则整次 `{ "status": "上传失败", "error": "..." }`（`submitted` 仍为拟提交的 jsonMap key），不要调 save。
+响应里取出该环境的登录 token。失败则该环境记录 `{ "status": "上传失败", "error": "..." }`（`submitted` 仍为拟提交的 jsonMap key），不要调该环境 save，但继续其它环境。
 
 ```js
 function login() {}                  // POST {BASE}/login；body 为 { name, password }，都从根目录 upload.config.json 读；返回 token
@@ -469,7 +481,7 @@ POST {BASE}/electricity-policy/save
 Content-Type: application/json
 ```
 
-带上 3.2 拿到的 token。`BASE`、用户名、密码只读根目录 `upload.config.json`，不写进 skill 正文。body 为 3.1 转出的数组，一次 POST 全部省。
+带上 3.2 拿到的对应环境 token。`BASE`、用户名、密码只读根目录 `upload.config.json` 中对应环境配置，不写进 skill 正文。body 为 3.1 转出的数组，每个启用环境各一次 POST 全部省。
 
 ---
 

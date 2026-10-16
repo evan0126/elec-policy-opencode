@@ -6,7 +6,7 @@
 
 ## 环境
 
-上传配置：复制根目录 `upload.config.example.json` 为 `upload.config.json`（已被 Git 忽略），填写 `base`（接口地址）、`user`（账号）、`password`（密码）。`enabled: false` 表示只下载、解析并保存 JSON，不登录、不上传；`enabled: true` 才允许上传。未创建配置文件时默认关闭上传，脚本不再内置默认账密。
+上传配置：复制根目录 `upload.config.example.json` 为 `upload.config.json`（已被 Git 忽略）。根级 `enabled` 为上传总开关；在 `environments.test`（测试）和 `environments.production`（正式）下分别填写 `enabled`、`base`、`user`、`password`，可只启用一个环境或同时启用两个。总开关默认关闭；全部目标关闭时也只下载、解析并保存 JSON。每个启用环境独立登录、提交并返回结果，一个失败不阻断另一个。配置示例及生产部署见 [部署文档](docs/部署文档.md#6-生产环境部署与上传配置)。
 
 上传仅使用配置文件，固定从项目根目录读取 `upload.config.json`。
 
@@ -33,7 +33,7 @@
 | `flow` | 编排入口（「更新」触发；省可省略） | 按项状态回复（有区用 label） |
 | `fetch-download` | 取链并下载（一次一省 / 一额外原文） | `data/file/{YYYY-MM}/{中文名}_电价表.{后缀}` |
 | `parse` | 按 pathMap **每个 key** `@general`；有 `regions.md` 则按 **label** 分文件 | 无分区 `{中文省}.json`；有分区各 `{label}.json` → `jsonMap` |
-| `upload` | 按 jsonMap 路径读盘 → 接口一次提交 | `{ status, error?, submitted }`（submitted = jsonMap key） |
+| `upload` | 按 jsonMap 路径读盘 → 各启用环境分别一次提交 | `{ status, error?, submitted, environments? }`（submitted = jsonMap key） |
 
 人说示例：`更新：浙江、江苏 9 月` 或 `更新：2026-10`（不写省 = `sources.json` 已覆盖全省）。
 
