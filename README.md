@@ -6,7 +6,7 @@
 
 ## 环境
 
-上传配置：复制根目录 `upload.config.example.json` 为 `upload.config.json`（已被 Git 忽略）。根级 `enabled` 为上传总开关；在 `environments.test`（测试）和 `environments.production`（正式）下分别填写 `enabled`、`base`、`user`、`password`，可只启用一个环境或同时启用两个。总开关默认关闭；全部目标关闭时也只下载、解析并保存 JSON。每个启用环境独立登录、提交并返回结果，一个失败不阻断另一个。配置示例及生产部署见 [部署文档](docs/部署文档.md#6-生产环境部署与上传配置)。
+上传配置：复制根目录 `upload.config.example.json` 为 `upload.config.json`（已被 Git 忽略）。根级 `enabled` 为上传总开关；在 `environments.test`（测试）和 `environments.production`（正式）下分别填写 `enabled`、`base`、`user`、`password`，可只启用一个环境或同时启用两个。总开关默认关闭；全部目标关闭时也只下载、解析并保存 JSON。每个启用环境独立登录、提交并返回结果，一个失败不阻断另一个。任务仅在测试服务器部署一套，上传时调用所选环境的接口。配置示例及部署方式见 [部署文档](docs/部署文档.md#6-测试服务器部署与双环境上传配置)。
 
 上传仅使用配置文件，固定从项目根目录读取 `upload.config.json`。
 

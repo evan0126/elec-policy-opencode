@@ -363,7 +363,7 @@ pathMap: { "zhejiang": "data/file/2026-09/浙江_电价表.pdf" }
 
 按 `flow` 传入的 `jsonMap`（省 id 或 `{provinceId}:{regionId}` → 本地 JSON 路径）读盘，转成接口数组，提交到自有系统。地址、用户名、密码只读根目录 `upload.config.json`。不下载、不解析电价原文。
 
-配置按环境组织：根级 `enabled` 为总开关，`environments.test` / `environments.production` 分别配置 `enabled`、`base`、`user`、`password`。未知字段报错。所有开关缺省 false；总开关关闭或没有启用环境时返回「仅解析」，不读电价 JSON、不登录、不提交。示例见根目录 `upload.config.example.json`，生产部署与三种上传模式见 `docs/部署文档.md` §6。
+配置按环境组织：根级 `enabled` 为总开关，`environments.test` / `environments.production` 分别配置 `enabled`、`base`、`user`、`password`。未知字段报错。所有开关缺省 false；总开关关闭或没有启用环境时返回「仅解析」，不读电价 JSON、不登录、不提交。项目仅在测试服务器部署一套任务，按配置调用测试 / 正式环境接口；正式服务器不另行部署任务。示例见根目录 `upload.config.example.json`，部署与三种上传模式见 `docs/部署文档.md` §6。
 
 每个启用环境使用自己的账号、token，各提交一次同一个转换数组；一个环境失败不阻断其它环境。返回 `environments.test` / `environments.production` 分别记录结果；全部成功才返回整体「更新成功」，任何一个失败则整体「上传失败」，`error` 带环境标识。报告列出各环境实际状态，省 / 分区汇总不按环境重复计数。已有终稿不会因增加环境自动补传，须显式调用上传脚本，并只开启待补传环境。
 
