@@ -32,7 +32,7 @@
 |---|---|---|
 | `flow` | 编排入口（「更新」触发；省可省略） | 按项状态回复（有区用 label） |
 | `fetch-download` | 取链并下载（一次一省 / 一额外原文） | `data/file/{YYYY-MM}/{中文名}_电价表.{后缀}` |
-| `parse` | 按 pathMap **每个 key** `@general`；有 `regions.json` 则按 **label** 分文件 | 无分区 `{中文省}.json`；有分区各 `{label}.json` → `jsonMap` |
+| `parse` | 按 pathMap **每个 key** `@general`；有 `regions.md` 则按 **label** 分文件 | 无分区 `{中文省}.json`；有分区各 `{label}.json` → `jsonMap` |
 | `upload` | 按 jsonMap 路径读盘 → 接口一次提交 | `{ status, error?, submitted }`（submitted = jsonMap key） |
 
 人说示例：`更新：浙江、江苏 9 月` 或 `更新：2026-10`（不写省 = `sources.json` 已覆盖全省）。
@@ -49,7 +49,7 @@
 .opencode/skills/
   flow/SKILL.md
   fetch-download/          # sources.json + open-column / find-file / run
-  parse/                   # template、common.md、regions.json、provinces/
+  parse/                   # template、common.md、regions.md、provinces/
   upload/scripts/          # to-api.mjs、post.mjs
 scripts/
   monthly-flow.mjs         # 月末窗口触发 flow

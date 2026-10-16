@@ -12,23 +12,35 @@ const PRICE_KEYS = {
   deepValley: 'deepValleyPrice',
 };
 
-/** region 枚举 → regions.json label（有区时 name 前缀用 label 替代省份） */
+/** region 枚举 → regions.md label（有区时 name 前缀用 label 替代省份） */
 const REGION_LABEL_BY_ID = (() => {
-  const regionsPath = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'parse', 'regions.json');
-  /** @type {Record<string, Array<{ region: string, label: string }>>} */
-  const raw = JSON.parse(readFileSync(regionsPath, 'utf8'));
+  const regionsPath = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'parse', 'regions.md');
+  const text = readFileSync(regionsPath, 'utf8');
   /** @type {Map<string, string>} */
   const map = new Map();
-  for (const list of Object.values(raw)) {
-    for (const item of list ?? []) {
-      if (item?.region && item?.label) map.set(String(item.region), String(item.label));
+  let inTable = false;
+  for (const line of text.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!inTable) {
+      if (/^\|\s*provinceId\s*\|\s*region\s*\|\s*label\s*\|$/.test(trimmed)) inTable = true;
+      continue;
     }
+    if (!trimmed.startsWith('|')) break;
+    const cells = trimmed.split('|').slice(1, -1).map(cell => cell.trim());
+    if (cells.length === 3 && cells.every(cell => /^:?-{3,}:?$/.test(cell))) continue;
+    const [provinceId, region, label] = cells;
+    if (cells.length !== 3 || !/^[a-z][a-z0-9_]*$/.test(provinceId) || !/^[A-Z][A-Z0-9_]*$/.test(region) || !label || label.includes('`')) {
+      throw new Error(`invalid regions.md row: ${line}`);
+    }
+    if (map.has(region)) throw new Error(`duplicate regions.md region: ${region}`);
+    map.set(region, label);
   }
+  if (map.size === 0) throw new Error('regions.md contains no region rows');
   return map;
 })();
 
 /**
- * name 前缀：无区用省份；有区用 regions.json 的 label（如 广东深圳）。
+ * name 前缀：无区用省份；有区用 regions.md 的 label（如 广东深圳）。
  * @param {Record<string, unknown>} row
  */
 export function namePrefix(row) {

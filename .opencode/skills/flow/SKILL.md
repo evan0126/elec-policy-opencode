@@ -7,7 +7,7 @@ description: >-
 
 # 编排跑通
 
-唯一编排入口。只分流与传参，不写 js。不打开电价正文、`provinces/*.md`、`data/file` / `data/json` 正文、`template.md`。禁止 `question`。可读 `regions.json` / `sources.json` 做编排。
+唯一编排入口。只分流与传参，不写 js。不打开电价正文、`provinces/*.md`、`data/file` / `data/json` 正文、`template.md`。禁止 `question`。可读 `regions.md` / `sources.json` 做编排。
 
 从「更新」对话取出 `YYYY-MM`；省可多个，**未写省**则读 `fetch-download/sources.json` 的 `provinces` 全部 key（跳过 `unsupported`）。「9 月」用对话年份。
 
@@ -21,7 +21,7 @@ description: >-
 本会话维护 `pathMap`、`jsonMap`（失败项和本轮开始前已有终稿的项不放进去；value 都是本轮新生成终稿的本地路径）。
 
 - `pathMap` key：标记电价来自哪份原文。省主原文用省 id；另一份原文用 `extraSources[].id`（如 `shenzhen`）。`id` 自定，且**不得**与 `sources.json` 的省 key / 别名撞名
-- `jsonMap` key：无 `regions.json` 配置用省 id；有配置用 `{provinceId}:{region}`（按实际写出的区；这里的 `:` 是分区，与 pathMap 无关）
+- `jsonMap` key：无 `regions.md` 配置用省 id；有配置用 `{provinceId}:{region}`（按实际写出的区；这里的 `:` 是分区，与 pathMap 无关）
 
 ## 1. 下载 → pathMap
 
@@ -45,12 +45,12 @@ description: >-
 
 按**省**处理（只认路径，不读正文）。某省相关的 pathMap 项 = 省 id 主 key + 该省 `extraSources[].id`。
 
-**无** `regions.json` 配置：
+**无** `regions.md` 配置：
 
 - 本轮开始前已有 `data/json/{YYYY-MM}/{中文省}.json` → 该项记为「更新成功」，跳过解析且不进 `jsonMap`
 - 否则：该省相关 pathMap 项交给 `parse`，仅将本轮成功写出的终稿加入 `jsonMap`
 
-**有** `regions.json` 配置：
+**有** `regions.md` 配置：
 
 - 对每个 `{ region, label }`：本轮开始前已有 `data/json/{YYYY-MM}/{label}.json` → 该项记为「更新成功」，跳过解析且不进 `jsonMap`
 - 若仍有缺失的 label，且该省相关 pathMap 非空 → 把这些 pathMap 项交给 `parse`（`parse` 按认出的分区分别落盘，不合并；子会话的 `provinceId` 仍用父省 id）
@@ -72,13 +72,13 @@ description: >-
 
 先按项列状态（有区就按区，不要把分区收成一行省）：
 
-- 显示名：无分区 → 中文省；有分区 → `regions.json` 的 `label`（如 `广东深圳`）
+- 显示名：无分区 → 中文省；有分区 → `regions.md` 的 `label`（如 `广东深圳`）
 - 状态：下载失败，原因：xxx / 解析失败，原因：xxx / 更新成功 / 上传失败，原因：xxx
 - 不贴电价 JSON
 
 「本地已有原文」只决定是否跳过下载，不是对人终态；「本轮开始前已有 JSON」直接记为「更新成功」，但不进入 `jsonMap`、不上传。
 
-**末尾空一行后再写汇总**（显示名同上；范围 = 本次目标展开后的全部应报项：无分区一省一项，有 `regions.json` 则每个 label 一项）：
+**末尾空一行后再写汇总**（显示名同上；范围 = 本次目标展开后的全部应报项：无分区一省一项，有 `regions.md` 则每个 label 一项）：
 
 ```
 汇总：成功更新 N 项，分别为 A、B、C；未更新 M 项：D、E。

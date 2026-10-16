@@ -6,7 +6,7 @@ name 与 skill 目录名必须一致。已定：
 | name             | 谁调用               | 做什么                                                    |
 | ---------------- | ----------------- | ------------------------------------------------------ |
 | `fetch-download` | `flow`            | 取直链并下载到本地，回复该省路径（每次一省）                                 |
-| `parse`          | `flow`            | 按 pathMap 解析并落盘 JSON；有 `regions.json` 则按 label 分文件，不合并 |
+| `parse`          | `flow`            | 按 pathMap 解析并落盘 JSON；有 `regions.md` 则按 label 分文件，不合并 |
 | `upload`         | `flow`            | 按 jsonMap 路径读 JSON，提交到自有系统                             |
 | `flow`           | 人说「更新」（省可省略）或每月调度 | 串行下载 → 仅将本轮新终稿补进 jsonMap（已有终稿直接跳过）→ 一次上传；允许半份     |
 
@@ -15,14 +15,14 @@ name 与 skill 目录名必须一致。已定：
 
 `pathMap` / `jsonMap` 的 value 一律是**本地路径**（失败项**不要**出现在 map 里）。
 
-- `pathMap` key：标记**电价来自哪份原文**。一省一份原文 → 省 id；另有独立原文 → `extraSources[].id`（如 `shenzhen`；只区分下载槽 / 覆盖文件，**不**表示只能出一个区，也**不必**等于 `regions.json` 枚举；`id` 不得与省 key / 别名撞名）
-- `jsonMap` key：本省无 `regions.json` → 省 id；有配置 → `{provinceId}:{region}`（按**实际写出的区**，每区一文件，**不**汇成一省一份；这里的 `:` 是分区）
+- `pathMap` key：标记**电价来自哪份原文**。一省一份原文 → 省 id；另有独立原文 → `extraSources[].id`（如 `shenzhen`；只区分下载槽 / 覆盖文件，**不**表示只能出一个区，也**不必**等于 `regions.md` 枚举；`id` 不得与省 key / 别名撞名）
+- `jsonMap` key：本省无 `regions.md` → 省 id；有配置 → `{provinceId}:{region}`（按**实际写出的区**，每区一文件，**不**汇成一省一份；这里的 `:` 是分区）
 
 解析前须有读表规则：pathMap 每个 key 要有 `provinces/{pathMapKey}.md`（省主与额外原文同级）。缺了就该 key 失败，提示「还没有写…的读表规则，请先补 …」。哪几个区的电价来自这份文件，写在对应覆盖 md 里。
 
 落盘约定：
 
-- 原文：`data/file/{YYYY-MM}/{中文名}_电价表.{后缀}`（分区原文用 `regions.json` 的 `label`；已有则覆盖）
+- 原文：`data/file/{YYYY-MM}/{中文名}_电价表.{后缀}`（分区原文用 `regions.md` 的 `label`；已有则覆盖）
 - 解析 JSON：无分区 → `data/json/{YYYY-MM}/{中文省}.json`；有分区 → 各 `data/json/{YYYY-MM}/{label}.json`
 
 示例 A（获取 2026-09 浙江、江苏；两省都成功）：
@@ -43,7 +43,7 @@ name 与 skill 目录名必须一致。已定：
 
 示例 B（浙江成功、江苏失败）：仅 `zhejiang` 进 pathMap / jsonMap。
 
-示例 C（广东有 `regions.json`，主表 + 深圳都解析成功）：
+示例 C（广东有 `regions.md`，主表 + 深圳都解析成功）：
 
 ```js
 // jsonMap：按分区，不合并成广东.json
@@ -136,7 +136,7 @@ name 与 skill 目录名必须一致。已定：
   "extraSources": [
     {
       "id": "shenzhen",           // pathMap key / CLI / 覆盖 md 名（勿与省 key 撞名）
-      "saveName": "广东深圳",     // 原文落盘中文名（自定，不绑 regions.json）
+      "saveName": "广东深圳",     // 原文落盘中文名（自定，不绑 regions.md）
       "portalCity": "深圳市",
       "titlePattern": "YYYY年M月代理购电",
       "titleInclude": ["深圳"]
@@ -237,7 +237,7 @@ function fail(msg) {}                  // 回复失败原因（flow 不把该省
 落盘（**有分区则按 label 分文件，不要汇成一省一份**）：
 
 
-| 本省 `regions.json` | 落盘                                                     | `jsonMap` key             |
+| 本省 `regions.md` | 落盘                                                     | `jsonMap` key             |
 | ----------------- | ------------------------------------------------------ | ------------------------- |
 | 无配置               | `data/json/{YYYY-MM}/{中文省}.json`                       | `{provinceId}`            |
 | 有配置               | 解析完按 `region` 分组，每组 `data/json/{YYYY-MM}/{label}.json` | `{provinceId}:{regionId}` |
@@ -286,7 +286,7 @@ function fail(msg) {}                  // 回复失败原因（flow 不把该省
 
 ### 文件分工
 
-父会话只编排 `@general`，不跑取链脚本。规则文件是 `template.md`、`common.md`、`rule.md`、`province-ids.md`、`regions.json`、`provinces/`。
+父会话只编排 `@general`，不跑取链脚本。规则文件是 `template.md`、`common.md`、`rule.md`、`province-ids.md`、`regions.md`、`provinces/`。
 
 ```
 .opencode/skills/parse/
@@ -295,7 +295,7 @@ function fail(msg) {}                  // 回复失败原因（flow 不把该省
   common.md                 # 规则：各省共用读表约定
   rule.md                   # 覆盖文件怎么写
   province-ids.md           # 规则：province / provinceId 只准抄本表
-  regions.json              # 分区枚举 + label（落盘文件名）；没有该省则 region 为 null
+  regions.md                # Markdown 表格：省 key、分区枚举、label；没有该省则 region 为 null
   provinces/                # 规则：怎么读表（只写相对 common 的差异）
     zhejiang.md             # 省主表
     guangdong.md            # 广东主表（一份原文内多区域）
@@ -313,19 +313,19 @@ function fail(msg) {}                  // 回复失败原因（flow 不把该省
 
 每个 key **只选上表那一份**。两份原文读法不同时，各自一份 md（一律同级，文件名 = pathMap key）。
 
-`regions.json`：有该省配置时，给出 `region` 枚举和落盘用的 `label`；没有配置则 JSON 里 `region` 为 `null`。
+`regions.md`：用 Markdown 表格维护分区配置，每行一个分区，列固定为 `provinceId | region | label`。这里的 `provinceId` 是 `sources.json` 的省 key（如 `guangdong`），不是入库数字编号；输出 JSON 的数字 `provinceId` 仍只抄 `province-ids.md`。有该省配置时，给出 `region` 枚举和落盘用的 `label`；没有配置则 JSON 里 `region` 为 `null`。
+
+上传脚本 `to-api.mjs` 直接读取该表，用 `region` 查找 `label` 作为名称前缀。维护时保留三列表头及列顺序，单元格使用纯文本，不加反引号、不含 `|`；分区枚举全表唯一。
 
 - **pathMap 管来源文件，jsonMap 管区**：一份原文出几个区，由该文件的覆盖 md 写明；认出几个就按 label 写几个 JSON
 - 多份原文 → pathMap 多个 key，各起一次解析；同一区不要在两份原文里重复出（覆盖里划清「要 / 不要」）
 - 有配置但认不出区名 → 本 key 失败（不要求「配置里每个枚举都必须在本文件出现」）
 
-```js
-{
-  "exampleProvince": [
-    { "region": "REGION_A", "label": "某省分区A" },
-    { "region": "REGION_B", "label": "某省分区B" }
-  ]
-}
+```md
+| provinceId | region | label |
+| --- | --- | --- |
+| exampleprovince | REGION_A | 某省分区A |
+| exampleprovince | REGION_B | 某省分区B |
 ```
 
 ### 2.2 父会话：编排
@@ -421,7 +421,7 @@ function toApi(jsonMap) {}           // 按路径读各省数组摊平，每条 
 function toRecord(row) {
   // name            ← 中文含义拼接：地名 + 用户类别 + 电价制度 +（电压等级）
   //                   无区：省份，如 浙江一般工商业用电单一制（1-10千伏）
-  //                   有区：regions.json 的 label，如 广东深圳一般工商业用电单一制（1-10千伏）
+  //                   有区：regions.md 的 label，如 广东深圳一般工商业用电单一制（1-10千伏）
   // province        ← Number(row.provinceId)（186，不要用拼音）
   // region          ← row.region；无区域就是 null
   // priceSource     ← "auto"
@@ -516,7 +516,7 @@ Content-Type: application/json
 
 ## 2. 解析 → jsonMap
 
-- 无 `regions.json`：已有 `{中文省}.json` → 视为已完成且不进 jsonMap；否则 parse，本轮新终稿进 jsonMap
+- 无 `regions.md`：已有 `{中文省}.json` → 视为已完成且不进 jsonMap；否则 parse，本轮新终稿进 jsonMap
 - 有配置：已有的 `{label}.json` 视为已完成且不进 jsonMap；仍缺 label 且 pathMap 非空 → parse（按分区分文件落盘，**不合并**），本轮新终稿按 `{省id}:{region}` 进 jsonMap
 - 全部 label 已有 → 不调 parse
 
@@ -565,7 +565,7 @@ jsonMap 非空则一次 `upload`。`submitted` = jsonMap key（有区就按区�
 | jsonMap | 省 id    | 一律 `{provinceId}:{region}`（按实际写出的区；每区一份，**不**汇成一省一份） |
 
 
-**无分区**（浙江、江苏；`regions.json` 无该项）：
+**无分区**（浙江、江苏；`regions.md` 无该省行）：
 
 ```js
 // pathMap

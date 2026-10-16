@@ -110,7 +110,7 @@ function resolveFetchArg(rawArg) {
 
 /**
  * 合并省配置与可选 extraSources。
- * 落盘名：主任务用 name；额外原文用 extraSources[].saveName（自定，不绑 regions.json）。
+ * 落盘名：主任务用 name；额外原文用 extraSources[].saveName（自定，不绑 regions.md）。
  * @param {string} provinceId
  * @param {object} base sources.json 省项
  * @param {string|null} sourceId extraSources[].id（如 shenzhen）

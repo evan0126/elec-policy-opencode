@@ -42,7 +42,7 @@
 | `name` | string | 是 | 政策名称。每档一条，用枚举**中文含义**拼接：`{省份}{用户类别}{电价制度}（{电压等级}）`。例：`浙江一般工商业用电单一制（1-10千伏）`、`陕西大工业用电两部制（35千伏）`。不要拼英文字段值。 |
 | `province` | string | 是 | 省份中文名。只抄 [province-ids.md](province-ids.md) 当前省那一行的 `province`，不要写「北京市」这类后缀，也不要从文件另起一名。 |
 | `provinceId` | string | 是 | 内部系统省份 id。只抄 [province-ids.md](province-ids.md) 当前省那一行的 `id`（如北京 `187`）。不要填 `sources.json` 的拼音节名。 |
-| `region` | string \| null | 是 | 省内区域电网枚举。见 [regions.json](regions.json)：该省**无配置** → 必须 `null`；**有配置且能认出** → 抄枚举；**有配置却认不出** → 整省解析失败，不要用 `null` 顶上、不要自造。 |
+| `region` | string \| null | 是 | 省内区域电网枚举。见 [regions.md](regions.md)：该省**无配置** → 必须 `null`；**有配置且能认出** → 抄枚举；**有配置却认不出** → 整省解析失败，不要用 `null` 顶上、不要自造。 |
 | `yearMonth` | string | 是 | 生效年月，格式 `YYYY-MM`。 |
 | `customerCategory` | string | 是 | 用户类别，仅表示用电分类，不含单一制/两部制。只准 `LARGE_INDUSTRY` / `GENERAL_COMMERCIAL`。 |
 | `tariffMode` | string | 是 | 电价制度：单一制或两部制。 |
