@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { normalizeUploadConfig } from '../scripts/upload-config.mjs';
+import { readFileSync } from 'node:fs';
+import { normalizeUploadConfig, parseUploadConfig } from '../scripts/upload-config.mjs';
 import { uploadJsonMap } from '../.opencode/skills/upload/scripts/post.mjs';
 
 const row = {
@@ -25,7 +26,16 @@ function mockApi(t, fail = () => false) {
   return calls;
 }
 
-test('接受小写分环境配置，缺省关闭，错误配置拒绝', () => {
+test('配置支持注释，保留 URL 和密码中的注释符号、引号及转义字符', () => {
+  const credentials = { enabled: true, base: 'https://example.test/api', user: 'test', password: 'a//b/*c*/"d\\e' };
+  const text = '\uFEFF{ // 总开关\n "enabled": true, /* 环境列表 */ "environments": { "test": ' + JSON.stringify(credentials) + ' } }';
+  assert.deepEqual(parseUploadConfig(text).environments.test, credentials);
+  const example = parseUploadConfig(readFileSync(new URL('../upload.config.example.json', import.meta.url), 'utf8'));
+  assert.equal(example.enabled, false);
+  assert.deepEqual(Object.keys(example.environments), ['test', 'production']);
+});
+
+test('接受分环境配置，缺省关闭，错误配置拒绝', () => {
   assert.equal(normalizeUploadConfig({}).enabled, false);
   assert.throws(() => normalizeUploadConfig({ ENABLED: true }), /Unknown upload config field/);
   assert.throws(() => normalizeUploadConfig({ environments: { TEST: {} } }), /Unknown upload environment/);

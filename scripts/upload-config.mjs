@@ -34,7 +34,13 @@ export function normalizeUploadConfig(config) {
   return { enabled, environments };
 }
 
+export function parseUploadConfig(text) {
+  // 匹配字符串或注释，只移除字符串外的注释，保留 URL 和密码中的特殊字符。
+  const json = text.replace(/^\uFEFF/, '').replace(/"(?:\\.|[^"\\])*"|\/\/[^\r\n]*|\/\*[\s\S]*?\*\//g, token =>
+    token.startsWith('"') ? token : token.replace(/[^\r\n]/g, ' '));
+  return normalizeUploadConfig(JSON.parse(json));
+}
+
 export function loadUploadConfig() {
-  const config = existsSync(configUrl) ? JSON.parse(readFileSync(configUrl, 'utf8').replace(/^\uFEFF/, '')) : {};
-  return normalizeUploadConfig(config);
+  return existsSync(configUrl) ? parseUploadConfig(readFileSync(configUrl, 'utf8')) : normalizeUploadConfig({});
 }
